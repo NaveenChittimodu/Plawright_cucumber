@@ -1,15 +1,15 @@
 import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
 import { chromium, Browser, Page, expect } from "@playwright/test";
 import { pageFixture } from "../../hooks/pageFixture";
+
+import { CONSTANT } from "../../common/Constants"
 // import exp from "constants";
 setDefaultTimeout(60 * 1000 * 2)
 let browser: Browser;
 let page: Page;
 
 Given('User navigates to the application', async function () {
-    // browser = await chromium.launch({ headless: false });
-    // page = await browser.newPage();
-    await pageFixture.page.goto("https://bookcart.azurewebsites.net/");
+    await pageFixture.page.goto(CONSTANT.BaseURL);
 });
 
 Then('User click on the login link', async function () {
@@ -32,14 +32,11 @@ When('User click on the login button', async function () {
 Then('Login should be success', async function () {
     const loginUsername = await pageFixture.page.locator(`//button[contains(@class,'mat-focus-indicator mat-menu-trigger')]`).textContent();
     console.log(`UserName is : ` , loginUsername);
-    // await page.close();
-    // await browser.close();
+    
 });
 
 Then('Login should fail', async function () {
     const failureMsg = await pageFixture.page.locator(`mat-error[role='alert']`);
     await expect(failureMsg).toBeVisible();
-    // await page.close();
-    // await browser.close();
 });
 
