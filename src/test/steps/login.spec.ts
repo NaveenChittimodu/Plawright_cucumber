@@ -1,42 +1,48 @@
 import { Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
 import { chromium, Browser, Page, expect } from "@playwright/test";
 import { pageFixture } from "../../hooks/pageFixture";
-
 import { CONSTANT } from "../../common/Constants"
-// import exp from "constants";
+import LoginPage from "../../pagesObject/login";
+
+
 setDefaultTimeout(60 * 1000 * 2)
-let browser: Browser;
+
+let loginPage : LoginPage;
 let page: Page;
+let browser: Browser;
 
 Given('User navigates to the application', async function () {
-    await pageFixture.page.goto(CONSTANT.BaseURL);
+    browser = await chromium.launch({ headless: false });
+    page = await browser.newPage();
+    loginPage = new LoginPage(page);
+    await loginPage.visit(CONSTANT.BaseURL);
+    
 });
 
 Then('User click on the login link', async function () {
-    await pageFixture.page.locator("//span[text()='Login']").click();
+    await loginPage.clickLogin();
 });
 
 Then('User enter the username as {string}', async function (username) {
-    await pageFixture.page.locator(`input[formcontrolname='username']`).fill(username);
+    await loginPage.enterUsername(username);
 });
 
 Then('User enter the password as {string}', async function (password) {
-    await pageFixture.page.locator(`input[formcontrolname='password']`).fill(password)
+    await loginPage.enterPassword(password);
 });
 
 When('User click on the login button', async function () {
-    await pageFixture.page.locator(`button[color='primary']`).click();
-    await pageFixture.page.waitForTimeout(3000);
+    await loginPage.Loginbtn();
 });
 
 Then('Login should be success', async function () {
-    const loginUsername = await pageFixture.page.locator(`//button[contains(@class,'mat-focus-indicator mat-menu-trigger')]`).textContent();
-    console.log(`UserName is : ` , loginUsername);
+    await loginPage.Loginsucess();
+    await browser.close();
     
 });
 
 Then('Login should fail', async function () {
-    const failureMsg = await pageFixture.page.locator(`mat-error[role='alert']`);
-    await expect(failureMsg).toBeVisible();
+    await loginPage.Loginfail();
+    await browser.close();
 });
 
